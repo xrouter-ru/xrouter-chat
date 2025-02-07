@@ -70,14 +70,7 @@ Your file content here
 </content>
 </write_to_file>
 
-## replace_in_file
-Description: Request to replace sections of content in an existing file using SEARCH/REPLACE blocks that define exact changes to specific parts of the file. This tool should be used when you need to make targeted changes to specific parts of a file.
-Parameters:
-- path: (required) The path of the file to modify (relative to the current working directory ${cwd.toPosix()})
-- diff: (required) One or more SEARCH/REPLACE blocks following this exact format:
-  \`\`\`
-  <<<<<<< SEARCH
-  [exact content to find]
+  [new content to replace with]
   =======
   [new content to replace with]
   >>>>>>> REPLACE
