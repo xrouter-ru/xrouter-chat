@@ -1,6 +1,4 @@
 import { CompletionOptions, ProviderMessage } from '@/providers/base.provider';
-import { COMPLETION_CONFIG } from '@/config/completion';
-import prisma from '@/lib/db';
 import { XRouterProvider } from '@/providers/xrouter/provider';
 
 export class ChatService {
@@ -15,7 +13,6 @@ export class ChatService {
 
   async sendMessage(
     message: string,
-    chatId?: string,
     options?: CompletionOptions
   ) {
     try {
