@@ -1,4 +1,4 @@
-export const GENERATION_CONFIG = {
+export const COMPLETION_CONFIG = {
   temperature: {
     default: 0.3,
     min: 0,
@@ -13,4 +13,4 @@ export const GENERATION_CONFIG = {
   }
 } as const;
 
-export type GenerationConfig = typeof GENERATION_CONFIG; 
+export type CompletionConfig = typeof COMPLETION_CONFIG;

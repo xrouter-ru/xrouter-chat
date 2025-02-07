@@ -13,7 +13,7 @@ export interface ProviderMessage {
   content: string;
 }
 
-export interface GenerationOptions {
+export interface CompletionOptions {
   temperature?: number;
   maxTokens?: number;
   model?: string;
@@ -43,7 +43,7 @@ export abstract class BaseProvider {
   // Abstract methods that must be implemented in each provider
   abstract createCompletion(
     message: string,
-    options?: GenerationOptions,
+    options?: CompletionOptions,
     previousMessages?: ProviderMessage[]
   ): Promise<CompletionResult>;
 
@@ -61,7 +61,7 @@ export abstract class BaseProvider {
     return new Error('Unknown error occurred');
   }
 
-  protected validateOptions(options?: GenerationOptions): GenerationOptions {
+  protected validateOptions(options?: CompletionOptions): CompletionOptions {
     return {
       temperature: options?.temperature ?? 0.7,
       maxTokens: options?.maxTokens ?? 1000

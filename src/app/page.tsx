@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { Message } from '@prisma/client';
-import { ProviderType } from '@/providers/factory';
-import { GENERATION_CONFIG } from '@/config/generation';
+import { COMPLETION_CONFIG } from '@/config/completion';
 import Header from '@/components/Header';
 import ChatWindow from '@/components/ChatWindow';
 import Footer from '@/components/Footer';
 
-interface GenerationSettings {
+interface CompletionSettings {
   temperature: number;
   maxTokens: number;
 }
@@ -17,22 +16,20 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [provider, setProvider] = useState<ProviderType>('yandex');
   const [model, setModel] = useState('');
   const [inputValue, setInputValue] = useState('');
-  const [settings, setSettings] = useState<GenerationSettings>({
-    temperature: GENERATION_CONFIG.temperature.default,
-    maxTokens: GENERATION_CONFIG.maxTokens.default
+  const [settings, setSettings] = useState<CompletionSettings>({
+    temperature: COMPLETION_CONFIG.temperature.default,
+    maxTokens: COMPLETION_CONFIG.maxTokens.default
   });
-  const [isProvidersLoading, setIsProvidersLoading] = useState(true);
   const [isModelsLoading, setIsModelsLoading] = useState(true);
 
   useEffect(() => {
-    // Загружаем модель по умолчанию для выбранного провайдера
+    // Загружаем модель по умолчанию
     async function loadDefaultModel() {
       try {
         setIsModelsLoading(true);
-        const response = await fetch(`/api/models?provider=${provider}`);
+        const response = await fetch('/api/models');
         if (!response.ok) throw new Error('Failed to load models');
         const models = await response.json();
         setModel(models[0] || '');
@@ -44,34 +41,7 @@ export default function Home() {
     }
 
     loadDefaultModel();
-  }, [provider]);
-
-  // Загрузка списка провайдеров
-  useEffect(() => {
-    async function loadProviders() {
-      try {
-        setIsProvidersLoading(true);
-        const response = await fetch('/api/providers');
-        if (!response.ok) throw new Error('Failed to load providers');
-        const data = await response.json();
-        // Если текущий провайдер недоступен, выбираем первый доступный
-        interface ProviderStatus {
-          id: ProviderType;
-          status: { available: boolean };
-        }
-        const availableProviders = data.filter((p: ProviderStatus) => p.status.available);
-        if (availableProviders.length > 0 && !availableProviders.some((p: ProviderStatus) => p.id === provider)) {
-          setProvider(availableProviders[0].id);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-      } finally {
-        setIsProvidersLoading(false);
-      }
-    }
-
-    loadProviders();
-  }, [provider]);
+  }, []);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -89,7 +59,6 @@ export default function Home() {
         message: message.trim(),
         response: null,
         model: model,
-        provider: provider,
         temperature: settings.temperature,
         maxTokens: settings.maxTokens,
         timestamp: new Date()
@@ -104,7 +73,6 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message,
-          provider,
           options: {
             model,
             temperature: settings.temperature,
@@ -144,26 +112,22 @@ export default function Home() {
     }
   };
 
-  const handleSettingsChange = (newSettings: GenerationSettings) => {
+  const handleSettingsChange = (newSettings: CompletionSettings) => {
     setSettings(newSettings);
   };
 
-  const isInitializing = isProvidersLoading || isModelsLoading;
+  const isInitializing = isModelsLoading;
 
   return (
     <div className="flex flex-col h-screen">
       <Header 
-        provider={provider}
-        onProviderChange={setProvider}
         model={model}
         onModelChange={setModel}
         disabled={loading}
-        isProvidersLoading={isProvidersLoading}
         isModelsLoading={isModelsLoading}
       />
       <ChatWindow 
         messages={messages}
-        provider={provider}
         loading={loading}
         error={error}
       />
@@ -188,7 +152,6 @@ export default function Home() {
         </div>
       </div>
       <Footer
-        provider={provider}
         temperature={settings.temperature}
         maxTokens={settings.maxTokens}
         onSettingsChange={handleSettingsChange}

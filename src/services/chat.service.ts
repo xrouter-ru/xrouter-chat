@@ -1,5 +1,5 @@
-import { GenerationOptions, ProviderMessage } from '@/providers/base.provider';
-import { GENERATION_CONFIG } from '@/config/generation';
+import { CompletionOptions, ProviderMessage } from '@/providers/base.provider';
+import { COMPLETION_CONFIG } from '@/config/completion';
 import prisma from '@/lib/db';
 import { XRouterProvider } from '@/providers/xrouter/provider';
 
@@ -16,7 +16,7 @@ export class ChatService {
   async sendMessage(
     message: string,
     chatId?: string,
-    options?: GenerationOptions
+    options?: CompletionOptions
   ) {
     try {
       // Get or create chat
@@ -60,8 +60,8 @@ export class ChatService {
           response: response.text,
           model: options?.model || 'gigachat/gigachat',
           provider: 'xrouter',
-          temperature: options?.temperature || GENERATION_CONFIG.temperature.default,
-          maxTokens: options?.maxTokens || GENERATION_CONFIG.maxTokens.default
+          temperature: options?.temperature || COMPLETION_CONFIG.temperature.default,
+          maxTokens: options?.maxTokens || COMPLETION_CONFIG.maxTokens.default
         }
       });
 

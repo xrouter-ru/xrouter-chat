@@ -1,11 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ProviderType } from '@/config/providers';
 
 interface ModelSelectorProps {
   selectedModel: string;
-  provider: ProviderType;
   onModelChange: (model: string) => void;
   disabled?: boolean;
   isLoading?: boolean;
@@ -13,7 +11,6 @@ interface ModelSelectorProps {
 
 export default function ModelSelector({
   selectedModel,
-  provider,
   onModelChange,
   disabled = false,
   isLoading = false
@@ -23,13 +20,8 @@ export default function ModelSelector({
 
   useEffect(() => {
     async function loadModels() {
-      if (provider !== 'xrouter') {
-        setError('Only XRouter provider is supported');
-        return;
-      }
-
       try {
-        const response = await fetch(`/api/models?provider=${provider}`);
+        const response = await fetch('/api/models');
         if (!response.ok) throw new Error('Failed to load models');
         const data = await response.json();
         setModels(data);
@@ -40,7 +32,7 @@ export default function ModelSelector({
     }
 
     loadModels();
-  }, [provider]);
+  }, []);
 
   if (error) {
     return (

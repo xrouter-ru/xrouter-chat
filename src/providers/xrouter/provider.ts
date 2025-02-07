@@ -3,7 +3,7 @@ import { z } from 'zod';
 import axios from 'axios';
 import {
   BaseProvider,
-  GenerationOptions,
+  CompletionOptions,
   CompletionResult,
   ProviderConfig,
   ProviderMessage
@@ -85,7 +85,7 @@ export class XRouterProvider extends BaseProvider {
 
   async createCompletion(
     message: string,
-    options?: GenerationOptions,
+    options?: CompletionOptions,
     previousMessages?: ProviderMessage[]
   ): Promise<CompletionResult> {
     try {

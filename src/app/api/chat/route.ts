@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ChatService } from '@/services/chat.service';
-import { GenerationOptions } from '@/providers/base.provider';
+import { CompletionOptions } from '@/providers/base.provider';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const chatService = new ChatService();
-    const generationOptions: GenerationOptions = {
+    const completionOptions: CompletionOptions = {
       model: options?.model,
       temperature: options?.temperature,
       maxTokens: options?.maxTokens
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     const result = await chatService.sendMessage(
       message,
       chatId,
-      generationOptions
+      completionOptions
     );
 
     return Response.json(result);

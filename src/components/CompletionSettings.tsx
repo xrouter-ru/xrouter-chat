@@ -1,18 +1,18 @@
 'use client';
 
-interface GenerationSettingsProps {
+interface CompletionSettingsProps {
   temperature: number;
   maxTokens: number;
   onSettingsChange: (settings: { temperature: number; maxTokens: number }) => void;
   disabled?: boolean;
 }
 
-export default function GenerationSettings({
+export default function CompletionSettings({
   temperature,
   maxTokens,
   onSettingsChange,
   disabled = false
-}: GenerationSettingsProps) {
+}: CompletionSettingsProps) {
   return (
     <div className="flex gap-4 items-center text-sm text-gray-600 dark:text-gray-400">
       <div className="flex items-center gap-2">
@@ -56,4 +56,4 @@ export default function GenerationSettings({
       </div>
     </div>
   );
-} 
+}

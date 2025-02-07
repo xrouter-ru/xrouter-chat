@@ -2,12 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 import { Message } from '@prisma/client';
-import { ProviderType } from '@/providers/factory';
-import { getProviderDisplayName, PROVIDER_CONFIG } from '@/config/providers';
 
 interface ChatWindowProps {
   messages: Message[];
-  provider: ProviderType;
   loading?: boolean;
   error?: string | null;
 }
@@ -62,51 +59,43 @@ const UserMessage = ({ message }: { message: string }) => (
   </div>
 );
 
-// Компонент ответа провайдера
-const ProviderResponse = ({ response, model, provider, currentProvider }: { response: string; model?: string | null; provider: string; currentProvider: ProviderType }) => {
-  // Используем currentProvider как fallback, если provider не является валидным ProviderType
-  const displayProvider = (PROVIDER_CONFIG[provider as ProviderType] ? provider : currentProvider) as ProviderType;
-  
-  return (
-    <div className="flex justify-start">
-      <div className="inline-block max-w-[80%] p-4 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 group">
-        <div className="text-sm mb-1">{getProviderDisplayName(displayProvider)}</div>
-        <div className="whitespace-pre-wrap break-words" data-testid="provider-response">
-          {response}
-        </div>
-        <div className="mt-2 flex items-center justify-between">
-          {model && (
-            <div className="text-xs opacity-70">
-              Модель: {model}
-            </div>
-          )}
-          <CopyButton text={response} />
-        </div>
+// Компонент ответа ассистента
+const AssistantResponse = ({ response, model }: { response: string; model?: string | null }) => (
+  <div className="flex justify-start">
+    <div className="inline-block max-w-[80%] p-4 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 group">
+      <div className="whitespace-pre-wrap break-words" data-testid="provider-response">
+        {response}
+      </div>
+      <div className="mt-2 flex items-center justify-between">
+        {model && (
+          <div className="text-xs opacity-70">
+            Модель: {model}
+          </div>
+        )}
+        <CopyButton text={response} />
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 // Компонент сообщения с ответом
-const MessageWithResponse = ({ message, response, model, provider, currentProvider }: { message: string; response?: string | null; model?: string | null; provider: string; currentProvider: ProviderType }) => (
+const MessageWithResponse = ({ message, response, model }: { message: string; response?: string | null; model?: string | null }) => (
   <div className="space-y-4">
     <UserMessage message={message} />
     {response && (
-      <ProviderResponse 
+      <AssistantResponse 
         response={response} 
-        model={model} 
-        provider={provider}
-        currentProvider={currentProvider}
+        model={model}
       />
     )}
   </div>
 );
 
 // Компонент загрузки
-const LoadingIndicator = ({ provider }: { provider: ProviderType }) => (
+const LoadingIndicator = () => (
   <div className="flex justify-center items-center py-4">
     <div className="animate-pulse text-gray-500 dark:text-gray-400">
-      {getProviderDisplayName(provider)} печатает...
+      Печатает...
     </div>
   </div>
 );
@@ -126,7 +115,7 @@ const ErrorState = ({ error }: { error: string }) => (
 );
 
 // Компонент списка сообщений
-const MessageList = ({ messages, currentProvider }: { messages: Message[]; currentProvider: ProviderType }) => (
+const MessageList = ({ messages }: { messages: Message[] }) => (
   <div className="space-y-4">
     {messages.map((msg) => (
       <MessageWithResponse 
@@ -134,8 +123,6 @@ const MessageList = ({ messages, currentProvider }: { messages: Message[]; curre
         message={msg.message}
         response={msg.response}
         model={msg.model}
-        provider={msg.provider}
-        currentProvider={currentProvider}
       />
     ))}
   </div>
@@ -143,7 +130,6 @@ const MessageList = ({ messages, currentProvider }: { messages: Message[]; curre
 
 export default function ChatWindow({ 
   messages, 
-  provider,
   loading = false,
   error = null 
 }: ChatWindowProps) {
@@ -162,10 +148,10 @@ export default function ChatWindow({
       ) : messages.length === 0 ? (
         <EmptyState />
       ) : (
-        <MessageList messages={messages} currentProvider={provider} />
+        <MessageList messages={messages} />
       )}
-      {loading && <LoadingIndicator provider={provider} />}
+      {loading && <LoadingIndicator />}
       <div ref={bottomRef} />
     </div>
   );
-} 
+}
