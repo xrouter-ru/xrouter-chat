@@ -199,9 +199,14 @@ Your final result description here
 <path>src/components/App.tsx</path>
 <diff>
 <<<<<<< SEARCH
-import React from 'react';
+import React, { useState } from 'react';
 =======
 import React, { useState } from 'react';
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+
+=======
 >>>>>>> REPLACE
 
 <<<<<<< SEARCH
@@ -210,10 +215,6 @@ function handleSubmit() {
   setLoading(false);
 }
 
-=======
->>>>>>> REPLACE
-
-<<<<<<< SEARCH
 return (
   <div>
 =======
