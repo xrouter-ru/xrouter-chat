@@ -46,7 +46,37 @@ const xrouterResponseSchema = z.object({
   system_fingerprint: z.string().optional()
 });
 
+const modelsResponseSchema = z.object({
+  data: z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string(),
+      created: z.number(),
+      context_length: z.number(),
+      architecture: z.object({
+        instruct_type: z.string(),
+        modality: z.string(),
+        tokenizer: z.string()
+      }),
+      per_request_limits: z.record(z.any()),
+      pricing: z.object({
+        completion: z.string(),
+        image: z.string(),
+        prompt: z.string(),
+        request: z.string()
+      }),
+      top_provider: z.object({
+        context_length: z.number(),
+        is_moderated: z.boolean(),
+        max_completion_tokens: z.number()
+      })
+    })
+  )
+});
+
 type XRouterResponse = z.infer<typeof xrouterResponseSchema>;
+type ModelsResponse = z.infer<typeof modelsResponseSchema>;
 
 export class XRouterProvider extends BaseProvider {
   constructor(config: ProviderConfig) {
@@ -80,7 +110,7 @@ export class XRouterProvider extends BaseProvider {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': this.config.credentials,
+            'Authorization': this.config.apiKey,
             'X-Request-ID': uuidv4()
           }
         }
@@ -118,14 +148,18 @@ export class XRouterProvider extends BaseProvider {
         `${this.config.apiUrl}/api/v1/models`,
         {
           headers: {
-            'Authorization': this.config.credentials,
+            'Authorization': this.config.apiKey,
             'X-Request-ID': uuidv4()
           }
         }
       );
 
-      console.log('Available XRouter models:', response.data);
-      return Array.isArray(response.data) ? response.data : [];
+      console.log('Raw models response:', response.data);
+      const validated = modelsResponseSchema.parse(response.data);
+      const modelIds = validated.data.map(model => model.id);
+      console.log('Available model IDs:', modelIds);
+      
+      return modelIds;
     } catch (error) {
       console.error('Error listing XRouter models:', error);
       if (axios.isAxiosError(error)) {

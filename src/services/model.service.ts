@@ -1,4 +1,3 @@
-import { ProviderType } from '@/config/providers';
 import { XRouterProvider } from '@/providers/xrouter/provider';
 
 export class ModelService {
@@ -11,17 +10,13 @@ export class ModelService {
     if (!this.provider) {
       this.provider = new XRouterProvider({
         apiUrl: process.env.XROUTER_API_URL || '',
-        credentials: process.env.XROUTER_API_KEY || ''
+        apiKey: process.env.XROUTER_API_KEY || ''
       });
     }
     return this.provider;
   }
 
-  static async getModels(providerType: ProviderType): Promise<string[]> {
-    if (providerType !== 'xrouter') {
-      throw new Error('Only XRouter provider is supported');
-    }
-
+  static async getModels(): Promise<string[]> {
     const now = Date.now();
 
     // Check cache

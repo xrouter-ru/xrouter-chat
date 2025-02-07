@@ -1,10 +1,10 @@
 import { z } from 'zod';
 import { SYSTEM_PROMPTS, SystemPromptType } from '@/config/prompts';
 
-// Общие типы для всех провайдеров
+// Common types for all providers
 export interface ProviderConfig {
   apiUrl: string;
-  credentials: string;
+  apiKey: string;
   systemPrompt?: SystemPromptType;
 }
 
@@ -28,7 +28,7 @@ export interface GenerationResult {
   };
 }
 
-// Базовый класс для всех провайдеров
+// Base class for all providers
 export abstract class BaseProvider {
   protected config: ProviderConfig;
   protected responseSchema: z.ZodType;
@@ -40,7 +40,7 @@ export abstract class BaseProvider {
     this.systemPrompt = SYSTEM_PROMPTS[config.systemPrompt || 'default'];
   }
 
-  // Абстрактные методы, которые должны быть реализованы в каждом провайдере
+  // Abstract methods that must be implemented in each provider
   abstract generateResponse(
     message: string,
     options?: GenerationOptions,
@@ -49,7 +49,7 @@ export abstract class BaseProvider {
 
   abstract listModels(): Promise<string[]>;
 
-  // Общие методы для всех провайдеров
+  // Common methods for all providers
   protected validateResponse(response: unknown): unknown {
     return this.responseSchema.parse(response);
   }
@@ -80,4 +80,4 @@ export abstract class BaseProvider {
     messages.push({ role: 'user', content: message });
     return messages;
   }
-} 
+}

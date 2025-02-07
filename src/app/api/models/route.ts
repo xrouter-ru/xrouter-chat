@@ -1,23 +1,10 @@
 import { NextRequest } from 'next/server';
 import { ModelService } from '@/services/model.service';
-import { ProviderType } from '@/config/providers';
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const provider = searchParams.get('provider');
-
-    if (!provider) {
-      return new Response('Provider is required', { status: 400 });
-    }
-
-    if (provider !== 'xrouter') {
-      return new Response('Only XRouter provider is supported', { status: 400 });
-    }
-
-    const models = await ModelService.getModels(provider as ProviderType);
+    const models = await ModelService.getModels();
     return Response.json(models);
-
   } catch (error) {
     console.error('Error in models API:', error);
     return new Response(

@@ -2,19 +2,14 @@ import { GenerationOptions, ProviderMessage } from '@/providers/base.provider';
 import { GENERATION_CONFIG } from '@/config/generation';
 import prisma from '@/lib/db';
 import { XRouterProvider } from '@/providers/xrouter/provider';
-import { ProviderType } from '@/config/providers';
 
 export class ChatService {
   private provider: XRouterProvider;
 
-  constructor(providerType: ProviderType) {
-    if (providerType !== 'xrouter') {
-      throw new Error('Only XRouter provider is supported');
-    }
-    
+  constructor() {
     this.provider = new XRouterProvider({
       apiUrl: process.env.XROUTER_API_URL || '',
-      credentials: process.env.XROUTER_API_KEY || ''
+      apiKey: process.env.XROUTER_API_KEY || ''
     });
   }
 
@@ -63,7 +58,7 @@ export class ChatService {
           chatId: chat.id,
           message: message,
           response: response.text,
-          model: options?.model || 'default',
+          model: options?.model || 'gigachat/gigachat',
           provider: 'xrouter',
           temperature: options?.temperature || GENERATION_CONFIG.temperature.default,
           maxTokens: options?.maxTokens || GENERATION_CONFIG.maxTokens.default
