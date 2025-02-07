@@ -4,7 +4,7 @@ import axios from 'axios';
 import {
   BaseProvider,
   GenerationOptions,
-  GenerationResult,
+  CompletionResult,
   ProviderConfig,
   ProviderMessage
 } from '../base.provider';
@@ -83,11 +83,11 @@ export class XRouterProvider extends BaseProvider {
     super(config, xrouterResponseSchema);
   }
 
-  async generateResponse(
+  async createCompletion(
     message: string,
     options?: GenerationOptions,
     previousMessages?: ProviderMessage[]
-  ): Promise<GenerationResult> {
+  ): Promise<CompletionResult> {
     try {
       const validatedOptions = this.validateOptions(options);
       const messages = this.formatMessages(message, previousMessages);

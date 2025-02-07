@@ -19,7 +19,7 @@ export interface GenerationOptions {
   model?: string;
 }
 
-export interface GenerationResult {
+export interface CompletionResult {
   text: string;
   usage?: {
     promptTokens: number;
@@ -41,11 +41,11 @@ export abstract class BaseProvider {
   }
 
   // Abstract methods that must be implemented in each provider
-  abstract generateResponse(
+  abstract createCompletion(
     message: string,
     options?: GenerationOptions,
     previousMessages?: ProviderMessage[]
-  ): Promise<GenerationResult>;
+  ): Promise<CompletionResult>;
 
   abstract listModels(): Promise<string[]>;
 

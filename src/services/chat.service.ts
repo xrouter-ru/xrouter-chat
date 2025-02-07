@@ -46,7 +46,7 @@ export class ChatService {
       })) as ProviderMessage[];
 
       // Get response from provider
-      const response = await this.provider.generateResponse(
+      const response = await this.provider.createCompletion(
         message,
         options,
         context
