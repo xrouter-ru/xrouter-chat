@@ -38,9 +38,8 @@ export abstract class BaseProvider {
 
   // Abstract methods that must be implemented in each provider
   abstract createCompletion(
-    message: string,
-    options?: CompletionOptions,
-    previousMessages?: ProviderMessage[]
+    messages: ProviderMessage[],
+    options?: CompletionOptions
   ): Promise<CompletionResult>;
 
   abstract getModels(): Promise<string[]>;
