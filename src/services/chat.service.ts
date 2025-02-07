@@ -1,13 +1,21 @@
-import { ProviderFactory, ProviderType } from '@/providers/factory';
 import { GenerationOptions, ProviderMessage } from '@/providers/base.provider';
 import { GENERATION_CONFIG } from '@/config/generation';
 import prisma from '@/lib/db';
+import { XRouterProvider } from '@/providers/xrouter/provider';
+import { ProviderType } from '@/config/providers';
 
 export class ChatService {
-  private provider;
+  private provider: XRouterProvider;
 
   constructor(providerType: ProviderType) {
-    this.provider = ProviderFactory.createProvider(providerType);
+    if (providerType !== 'xrouter') {
+      throw new Error('Only XRouter provider is supported');
+    }
+    
+    this.provider = new XRouterProvider({
+      apiUrl: process.env.XROUTER_API_URL || '',
+      credentials: process.env.XROUTER_API_KEY || ''
+    });
   }
 
   async sendMessage(
@@ -16,12 +24,12 @@ export class ChatService {
     options?: GenerationOptions
   ) {
     try {
-      // Получаем или создаем чат
+      // Get or create chat
       const chat = chatId 
         ? await prisma.chat.findUnique({ where: { id: chatId } })
         : await prisma.chat.create({ 
             data: { 
-              provider: this.provider.constructor.name.replace('Provider', '').toLowerCase()
+              provider: 'xrouter'
             } 
           });
 
@@ -29,34 +37,34 @@ export class ChatService {
         throw new Error('Chat not found');
       }
 
-      // Получаем предыдущие сообщения для контекста
+      // Get previous messages for context
       const previousMessages = await prisma.message.findMany({
         where: { chatId: chat.id },
         orderBy: { timestamp: 'asc' },
         take: 10
       });
 
-      // Форматируем сообщения для провайдера
+      // Format messages for provider
       const context = previousMessages.map(msg => ({
         role: msg.response ? 'assistant' : 'user',
         content: msg.response || msg.message
       })) as ProviderMessage[];
 
-      // Получаем ответ от провайдера
+      // Get response from provider
       const response = await this.provider.generateResponse(
         message,
         options,
         context
       );
 
-      // Сохраняем сообщение в БД
+      // Save message to DB
       const savedMessage = await prisma.message.create({
         data: {
           chatId: chat.id,
           message: message,
           response: response.text,
           model: options?.model || 'default',
-          provider: this.provider.constructor.name.replace('Provider', '').toLowerCase(),
+          provider: 'xrouter',
           temperature: options?.temperature || GENERATION_CONFIG.temperature.default,
           maxTokens: options?.maxTokens || GENERATION_CONFIG.maxTokens.default
         }
@@ -80,4 +88,4 @@ export class ChatService {
       orderBy: { timestamp: 'asc' }
     });
   }
-} 
+}

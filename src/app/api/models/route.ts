@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { ModelService } from '@/services/model.service';
-import { ProviderType } from '@/providers/factory';
+import { ProviderType } from '@/config/providers';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,6 +9,10 @@ export async function GET(request: NextRequest) {
 
     if (!provider) {
       return new Response('Provider is required', { status: 400 });
+    }
+
+    if (provider !== 'xrouter') {
+      return new Response('Only XRouter provider is supported', { status: 400 });
     }
 
     const models = await ModelService.getModels(provider as ProviderType);
@@ -21,4 +25,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { ChatService } from '@/services/chat.service';
 import { GenerationOptions } from '@/providers/base.provider';
+import { ProviderType } from '@/config/providers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,11 +11,12 @@ export async function POST(request: NextRequest) {
       return new Response('Message is required', { status: 400 });
     }
 
-    if (!provider) {
-      return new Response('Provider is required', { status: 400 });
+    // Validate provider
+    if (provider !== 'xrouter') {
+      return new Response('Only XRouter provider is supported', { status: 400 });
     }
 
-    const chatService = new ChatService(provider);
+    const chatService = new ChatService(provider as ProviderType);
     const generationOptions: GenerationOptions = {
       model: options?.model,
       temperature: options?.temperature,
@@ -36,4 +38,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

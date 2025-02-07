@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ProviderType } from '@/providers/factory';
-import { getProviderDisplayName } from '@/config/providers';
+import { ProviderType, getProviderDisplayName } from '@/config/providers';
 
 interface ProviderSelectorProps {
   selectedProvider: ProviderType;
@@ -16,7 +15,8 @@ interface ProviderStatus {
   status: {
     available: boolean;
     lastCheck: number;
-  };
+    error?: string;
+  } | null;
 }
 
 export default function ProviderSelector({
@@ -25,55 +25,60 @@ export default function ProviderSelector({
   disabled = false,
   isLoading = false
 }: ProviderSelectorProps) {
-  const [providers, setProviders] = useState<ProviderStatus[]>([]);
+  const [provider, setProvider] = useState<ProviderStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadProviders() {
+    async function loadProvider() {
       try {
         const response = await fetch('/api/providers');
-        if (!response.ok) throw new Error('Failed to load providers');
+        if (!response.ok) throw new Error('Failed to load provider status');
         const data = await response.json();
-        setProviders(data);
+        setProvider(data[0]); // XRouter is the only provider
         setError(null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Unknown error');
       }
     }
 
-    loadProviders();
+    loadProvider();
   }, []);
 
   if (error) {
     return (
       <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
-        <span>Ошибка: {error}</span>
+        <span>Error: {error}</span>
       </div>
     );
   }
 
+  const isAvailable = provider?.status?.available ?? false;
+
   return (
     <div className="flex items-center gap-4 text-sm">
       <label htmlFor="provider" className="text-gray-600 dark:text-gray-400">
-        Провайдер:
+        Provider:
       </label>
       <select
         id="provider"
         value={selectedProvider}
         onChange={(e) => onProviderChange(e.target.value as ProviderType)}
-        disabled={disabled || isLoading}
+        disabled={disabled || isLoading || !isAvailable}
         className="px-2 py-1 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
-          <option value="">Загрузка...</option>
+          <option value="">Loading...</option>
         ) : (
-          providers.map(({ id, status }) => (
-            <option key={id} value={id} disabled={!status.available}>
-              {getProviderDisplayName(id)} {!status.available && '(недоступен)'}
-            </option>
-          ))
+          <option value="xrouter" disabled={!isAvailable}>
+            {getProviderDisplayName('xrouter')} {!isAvailable && '(unavailable)'}
+          </option>
         )}
       </select>
+      {provider?.status?.error && (
+        <span className="text-sm text-red-600 dark:text-red-400">
+          {provider.status.error}
+        </span>
+      )}
     </div>
   );
-} 
+}

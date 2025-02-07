@@ -1,44 +1,56 @@
-import { ProviderFactory, ProviderType } from '@/providers/factory';
+import { ProviderType } from '@/config/providers';
+import { XRouterProvider } from '@/providers/xrouter/provider';
 
 export class ModelService {
-  private static modelCache: Map<ProviderType, string[]> = new Map();
-  private static cacheTimeout = 5 * 60 * 1000; // 5 минут
-  private static lastUpdate: Map<ProviderType, number> = new Map();
+  private static modelCache: string[] | null = null;
+  private static cacheTimeout = 5 * 60 * 1000; // 5 minutes
+  private static lastUpdate: number | null = null;
+  private static provider: XRouterProvider | null = null;
+
+  private static getProvider(): XRouterProvider {
+    if (!this.provider) {
+      this.provider = new XRouterProvider({
+        apiUrl: process.env.XROUTER_API_URL || '',
+        credentials: process.env.XROUTER_API_KEY || ''
+      });
+    }
+    return this.provider;
+  }
 
   static async getModels(providerType: ProviderType): Promise<string[]> {
-    const now = Date.now();
-    const lastUpdate = this.lastUpdate.get(providerType) || 0;
+    if (providerType !== 'xrouter') {
+      throw new Error('Only XRouter provider is supported');
+    }
 
-    // Проверяем кэш
+    const now = Date.now();
+
+    // Check cache
     if (
-      this.modelCache.has(providerType) && 
-      now - lastUpdate < this.cacheTimeout
+      this.modelCache &&
+      this.lastUpdate &&
+      now - this.lastUpdate < this.cacheTimeout
     ) {
-      return this.modelCache.get(providerType)!;
+      return this.modelCache;
     }
 
     try {
-      const provider = ProviderFactory.createProvider(providerType);
+      const provider = this.getProvider();
       const models = await provider.listModels();
 
-      // Обновляем кэш
-      this.modelCache.set(providerType, models);
-      this.lastUpdate.set(providerType, now);
+      // Update cache
+      this.modelCache = models;
+      this.lastUpdate = now;
 
       return models;
     } catch (error) {
-      console.error(`Error fetching models for ${providerType}:`, error);
+      console.error('Error fetching XRouter models:', error);
       throw error;
     }
   }
 
-  static clearCache(providerType?: ProviderType) {
-    if (providerType) {
-      this.modelCache.delete(providerType);
-      this.lastUpdate.delete(providerType);
-    } else {
-      this.modelCache.clear();
-      this.lastUpdate.clear();
-    }
+  static clearCache() {
+    this.modelCache = null;
+    this.lastUpdate = null;
+    this.provider = null;
   }
-} 
+}

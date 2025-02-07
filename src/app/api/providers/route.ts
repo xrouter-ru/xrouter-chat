@@ -3,12 +3,12 @@ import { ProviderService } from '@/services/provider.service';
 export async function GET() {
   try {
     const providers = await ProviderService.getAvailableProviders();
-    const providerStatuses = providers.map(provider => ({
-      id: provider,
-      status: ProviderService.getProviderStatus(provider)
-    }));
+    const status = ProviderService.getProviderStatus();
 
-    return Response.json(providerStatuses);
+    return Response.json([{
+      id: 'xrouter',
+      status
+    }]);
 
   } catch (error) {
     console.error('Error in providers API:', error);
@@ -17,4 +17,4 @@ export async function GET() {
       { status: 500 }
     );
   }
-} 
+}
