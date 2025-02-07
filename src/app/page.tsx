@@ -29,7 +29,7 @@ export default function Home() {
     async function loadDefaultModel() {
       try {
         setIsModelsLoading(true);
-        const response = await fetch('/api/v1/models');
+        const response = await fetch('/api/models');
         if (!response.ok) throw new Error('Failed to load models');
         const models = await response.json();
         setModel(models[0] || '');
@@ -68,7 +68,7 @@ export default function Home() {
       setMessages(prev => [...prev, tempMessage]);
       setInputValue('');
 
-      const response = await fetch('/api/v1/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
