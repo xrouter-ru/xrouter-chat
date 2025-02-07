@@ -84,22 +84,18 @@ export class XRouterProvider extends BaseProvider {
   }
 
   async createCompletion(
-    message: string,
+    messages: { role: string; content: string }[],
     options?: CompletionOptions,
   ): Promise<CompletionResult> {
     try {
       const validatedOptions = this.validateOptions(options);
 
       console.log('Generating response with options:', validatedOptions);
-      console.log('Sending completion messages:', messages);
 
       const response = await axios.post(
         `${this.config.apiUrl}/api/v1/chat/completions`,
         {
-          messages: messages.map(msg => ({
-            role: msg.role,
-            content: msg.content
-          })),
+          messages: messages,
           model: options?.model || 'gigachat/gigachat',
           temperature: validatedOptions.temperature,
           max_tokens: validatedOptions.maxTokens,
