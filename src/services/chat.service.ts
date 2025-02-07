@@ -19,31 +19,7 @@ export class ChatService {
     options?: CompletionOptions
   ) {
     try {
-      // Get or create chat
-      const chat = chatId 
-        ? await prisma.chat.findUnique({ where: { id: chatId } })
-        : await prisma.chat.create({ 
-            data: { 
-              provider: 'xrouter'
-            } 
-          });
-
-      if (!chat) {
-        throw new Error('Chat not found');
-      }
-
-      // Get previous messages for context
-      const previousMessages = await prisma.message.findMany({
-        where: { chatId: chat.id },
-        orderBy: { timestamp: 'asc' },
-        take: 10
-      });
-
-      // Format messages for provider
-      const context = previousMessages.map(msg => ({
-        role: msg.response ? 'assistant' : 'user',
-        content: msg.response || msg.message
-      })) as ProviderMessage[];
+      const context: ProviderMessage[] = [];
 
       // Get response from provider
       const response = await this.provider.createCompletion(
@@ -52,22 +28,8 @@ export class ChatService {
         context
       );
 
-      // Save message to DB
-      const savedMessage = await prisma.message.create({
-        data: {
-          chatId: chat.id,
-          message: message,
-          response: response.text,
-          model: options?.model || 'gigachat/gigachat',
-          provider: 'xrouter',
-          temperature: options?.temperature || COMPLETION_CONFIG.temperature.default,
-          maxTokens: options?.maxTokens || COMPLETION_CONFIG.maxTokens.default
-        }
-      });
-
       return {
-        message: savedMessage,
-        chatId: chat.id,
+        message: response.text,
         usage: response.usage
       };
 
@@ -77,10 +39,4 @@ export class ChatService {
     }
   }
 
-  async getHistory(chatId: string) {
-    return prisma.message.findMany({
-      where: { chatId },
-      orderBy: { timestamp: 'asc' }
-    });
-  }
 }
