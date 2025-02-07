@@ -47,7 +47,7 @@ export abstract class BaseProvider {
     previousMessages?: ProviderMessage[]
   ): Promise<CompletionResult>;
 
-  abstract listModels(): Promise<string[]>;
+  abstract getModels(): Promise<string[]>;
 
   // Common methods for all providers
   protected validateResponse(response: unknown): unknown {

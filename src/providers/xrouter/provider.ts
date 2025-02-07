@@ -141,7 +141,7 @@ export class XRouterProvider extends BaseProvider {
     }
   }
 
-  async listModels(): Promise<string[]> {
+  async getModels(): Promise<string[]> {
     try {
       console.log('Requesting XRouter models');
       const response = await axios.get(

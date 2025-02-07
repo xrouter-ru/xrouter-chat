@@ -30,7 +30,7 @@ export class ModelService {
 
     try {
       const provider = this.getProvider();
-      const models = await provider.listModels();
+      const models = await provider.getModels();
 
       // Update cache
       this.modelCache = models;
