@@ -86,14 +86,12 @@ export class XRouterProvider extends BaseProvider {
   async createCompletion(
     message: string,
     options?: CompletionOptions,
-    previousMessages?: ProviderMessage[]
   ): Promise<CompletionResult> {
     try {
       const validatedOptions = this.validateOptions(options);
-      const messages = this.formatMessages(message, previousMessages);
 
       console.log('Generating response with options:', validatedOptions);
-      console.log('Formatted messages:', messages);
+      console.log('Sending completion messages:', messages);
 
       const response = await axios.post(
         `${this.config.apiUrl}/api/v1/chat/completions`,
