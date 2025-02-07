@@ -63,15 +63,4 @@ export abstract class BaseProvider {
       maxTokens: options?.maxTokens ?? 1000
     };
   }
-
-  protected formatMessages(message: string, previousMessages?: ProviderMessage[]): ProviderMessage[] {
-    const messages: ProviderMessage[] = [];
-
-    if (previousMessages) {
-      messages.push(...previousMessages);
-    }
-
-    messages.push({ role: 'user', content: message });
-    return messages;
-  }
 }
