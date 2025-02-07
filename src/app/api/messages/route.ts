@@ -1,29 +1,16 @@
 import { NextRequest } from 'next/server';
 import { ChatService } from '@/services/chat.service';
-import { ProviderService } from '@/services/provider.service';
-import { ProviderType } from '@/providers/factory';
 
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const chatId = searchParams.get('chatId');
-    const provider = searchParams.get('provider') as ProviderType;
 
     if (!chatId) {
       return new Response('Chat ID is required', { status: 400 });
     }
 
-    if (!provider) {
-      return new Response('Provider is required', { status: 400 });
-    }
-
-    // Проверяем доступность провайдера
-    const isAvailable = await ProviderService.isProviderAvailable(provider);
-    if (!isAvailable) {
-      return new Response('Provider is not available', { status: 503 });
-    }
-
-    const chatService = new ChatService(provider);
+    const chatService = new ChatService();
     const messages = await chatService.getHistory(chatId);
 
     return Response.json(messages);
@@ -37,4 +24,4 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export const dynamic = 'force-dynamic'; 
+export const dynamic = 'force-dynamic';

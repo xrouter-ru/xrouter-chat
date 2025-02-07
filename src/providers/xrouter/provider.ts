@@ -110,8 +110,8 @@ export class XRouterProvider extends BaseProvider {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': this.config.apiKey,
-            'X-Request-ID': uuidv4()
+            'Authorization': `Bearer ${this.config.apiKey}`,
+            // 'X-Request-ID': uuidv4()
           }
         }
       );
@@ -148,8 +148,8 @@ export class XRouterProvider extends BaseProvider {
         `${this.config.apiUrl}/api/v1/models`,
         {
           headers: {
-            'Authorization': this.config.apiKey,
-            'X-Request-ID': uuidv4()
+            'Authorization': `Bearer ${this.config.apiKey}`,
+            // 'X-Request-ID': uuidv4()
           }
         }
       );
