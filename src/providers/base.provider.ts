@@ -1,15 +1,13 @@
 import { z } from 'zod';
-import { SYSTEM_PROMPTS, SystemPromptType } from '@/config/prompts';
 
 // Common types for all providers
 export interface ProviderConfig {
   apiUrl: string;
   apiKey: string;
-  systemPrompt?: SystemPromptType;
 }
 
 export interface ProviderMessage {
-  role: 'system' | 'user' | 'assistant';
+  role: 'user' | 'assistant';
   content: string;
 }
 
@@ -32,12 +30,10 @@ export interface CompletionResult {
 export abstract class BaseProvider {
   protected config: ProviderConfig;
   protected responseSchema: z.ZodType;
-  protected systemPrompt: string;
 
   constructor(config: ProviderConfig, responseSchema: z.ZodType) {
     this.config = config;
     this.responseSchema = responseSchema;
-    this.systemPrompt = SYSTEM_PROMPTS[config.systemPrompt || 'default'];
   }
 
   // Abstract methods that must be implemented in each provider
@@ -69,9 +65,7 @@ export abstract class BaseProvider {
   }
 
   protected formatMessages(message: string, previousMessages?: ProviderMessage[]): ProviderMessage[] {
-    const messages: ProviderMessage[] = [
-      { role: 'system', content: this.systemPrompt }
-    ];
+    const messages: ProviderMessage[] = [];
 
     if (previousMessages) {
       messages.push(...previousMessages);
