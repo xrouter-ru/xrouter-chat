@@ -15,7 +15,7 @@ export const SYSTEM_PROMPT = async (
 
 ИСПОЛЬЗОВАНИЕ ИНСТРУМЕНТОВ
 
-You have access to a set of tools that are executed upon the user's approval. You can use one tool per message, and will receive the result of that tool use in the user's response. You use tools step-by-step to accomplish a given task, with each tool use informed by the result of the previous tool use.
+У вас есть доступ к набору инструментов, которые выполняются после одобрения пользователем. Вы можете использовать один инструмент за сообщение и получите результат использования этого инструмента в ответе пользователя. Вы используете инструменты шаг за шагом для выполнения данной задачи, при этом каждое использование инструмента информируется результатом предыдущего использования инструмента.
 
 # Форматирование использования инструментов
 
