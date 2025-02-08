@@ -18,7 +18,7 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-2 bg-white border-b dark:bg-gray-900 dark:border-gray-800">
-      <h1 className="text-xl font-semibold">Multi-Model Chat</h1>
+      <h1 className="text-xl font-semibold">XRouter Chat</h1>
       <div className="flex items-center gap-4">
         <ModelSelector
           selectedModel={model}

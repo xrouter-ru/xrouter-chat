@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 interface ModelSelectorProps {
   selectedModel: string;
@@ -37,6 +38,7 @@ export default function ModelSelector({
   if (error) {
     return (
       <div className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
+        <ExclamationCircleIcon className="w-5 h-5" />
         <span>Error: {error}</span>
       </div>
     );
@@ -55,7 +57,7 @@ export default function ModelSelector({
         className="px-2 py-1 border rounded bg-white dark:bg-gray-800 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isLoading ? (
-          <option value="">Loading...</option>
+          <option value="">Загрузка моделей...</option>
         ) : (
           models.map((model) => (
             <option key={model} value={model}>

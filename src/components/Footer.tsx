@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ChevronDownIcon } from '@heroicons/react/24/outline';
 import { COMPLETION_CONFIG } from '@/config/completion';
 
 interface FooterProps {
@@ -35,9 +36,9 @@ export default function Footer({
           disabled={disabled}
         >
           <span>Настройки</span>
-          <span className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-            ▼
-          </span>
+          <ChevronDownIcon 
+            className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
         </button>
 
         {isOpen && (
