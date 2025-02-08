@@ -1,6 +1,6 @@
 {
-  "name": "multimodel-chat-ru",
-  "version": "2.0.0",
+  "name": "xrouter-chat",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,8 +9,6 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "type-check": "tsc --noEmit",
-    "test:gigachat": "tsx src/scripts/test-gigachat.ts",
-    "test:yandex": "tsx src/scripts/test-yandex.ts",
     "test": "jest --config jest.config.ts",
     "test:watch": "jest --watch"
   },
