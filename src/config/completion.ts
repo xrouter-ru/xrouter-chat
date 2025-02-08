@@ -5,7 +5,7 @@ export const COMPLETION_CONFIG = {
     max: 1,
     step: 0.1
   },
-  maxTokens: {
+  max_tokens: {
     default: 2000,
     min: 100,
     max: 4000,

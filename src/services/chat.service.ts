@@ -12,17 +12,13 @@ export class ChatService {
   }
 
   async sendMessage(
-    message: string,
+    messages: { role: string; content: string }[],
     options?: CompletionOptions
   ) {
     try {
-      const context: ProviderMessage[] = [];
-
-      // Get response from provider
       const response = await this.provider.createCompletion(
-        message,
-        options,
-        context
+        messages,
+        options
       );
 
       return {

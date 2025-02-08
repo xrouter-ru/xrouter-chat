@@ -1,26 +1,31 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Message } from '@prisma/client';
 import { COMPLETION_CONFIG } from '@/config/completion';
 import Header from '@/components/Header';
 import ChatWindow from '@/components/ChatWindow';
 import Footer from '@/components/Footer';
 
+interface ChatMessage {
+  role: string;
+  content: string;
+  model?: string | null;
+}
+
 interface CompletionSettings {
   temperature: number;
-  maxTokens: number;
+  max_tokens: number;
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [model, setModel] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [settings, setSettings] = useState<CompletionSettings>({
     temperature: COMPLETION_CONFIG.temperature.default,
-    maxTokens: COMPLETION_CONFIG.maxTokens.default
+    max_tokens: COMPLETION_CONFIG.max_tokens.default
   });
   const [isModelsLoading, setIsModelsLoading] = useState(true);
 
@@ -46,38 +51,28 @@ export default function Home() {
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
     
-    const tempId = Date.now();
-    
     try {
       setLoading(true);
       setError(null);
       
-      // Создаем временное сообщение пользователя
-      const tempMessage = {
-        id: tempId,
-        chatId: 'temp',
-        message: message.trim(),
-        response: null,
-        model: model,
-        temperature: settings.temperature,
-        maxTokens: settings.maxTokens,
-        timestamp: new Date()
-      } as Message;
+      // Добавляем сообщение пользователя
+      const updatedMessages = [
+        ...messages,
+        { role: 'user', content: message.trim() }
+      ];
       
-      // Добавляем сообщение пользователя немедленно
-      setMessages(prev => [...prev, tempMessage]);
+      // Обновляем состояние сообщений
+      setMessages(updatedMessages);
       setInputValue('');
 
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message,
-          options: {
-            model,
-            temperature: settings.temperature,
-            maxTokens: settings.maxTokens
-          }
+          messages: updatedMessages,
+          model,
+          temperature: settings.temperature,
+          max_tokens: settings.max_tokens
         })
       });
 
@@ -86,20 +81,22 @@ export default function Home() {
       }
 
       const data = await response.json();
-      console.log('API Response:', data); // Debug log
+      console.log('API Response:', data);
       
-      // Заменяем временное сообщение на полученное от сервера
-      setMessages(prev => prev.map(msg => 
-        msg.id === tempId ? {
-          ...data.message,
-          id: msg.id // Сохраняем временный ID для стабильности UI
-        } : msg
-      ));
+      // Добавляем ответ ассистента
+      setMessages([
+        ...updatedMessages,
+        { 
+          role: 'assistant', 
+          content: data.message,
+          model: model
+        }
+      ]);
     } catch (err) {
-      console.error('Error sending message:', err); // Debug log
+      console.error('Error sending message:', err);
       setError(err instanceof Error ? err.message : 'Failed to send message');
-      // Удаляем временное сообщение в случае ошибки
-      setMessages(prev => prev.filter(msg => msg.id !== tempId));
+      // В случае ошибки удаляем последнее сообщение пользователя
+      setMessages(messages);
     } finally {
       setLoading(false);
     }
@@ -153,7 +150,7 @@ export default function Home() {
       </div>
       <Footer
         temperature={settings.temperature}
-        maxTokens={settings.maxTokens}
+        max_tokens={settings.max_tokens}
         onSettingsChange={handleSettingsChange}
         disabled={loading || isInitializing}
       />

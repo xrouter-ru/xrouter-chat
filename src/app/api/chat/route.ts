@@ -4,22 +4,21 @@ import { CompletionOptions } from '@/providers/base.provider';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message, chatId, options } = await request.json();
+    const { messages, model, temperature, max_tokens } = await request.json();
 
-    if (!message) {
-      return new Response('Message is required', { status: 400 });
+    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+      return new Response('Messages array is required', { status: 400 });
     }
 
     const chatService = new ChatService();
     const completionOptions: CompletionOptions = {
-      model: options?.model,
-      temperature: options?.temperature,
-      maxTokens: options?.maxTokens
+      model,
+      temperature,
+      max_tokens: max_tokens
     };
 
     const result = await chatService.sendMessage(
-      message,
-      chatId,
+      messages,
       completionOptions
     );
 

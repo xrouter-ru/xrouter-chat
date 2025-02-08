@@ -5,25 +5,25 @@ import { COMPLETION_CONFIG } from '@/config/completion';
 
 interface FooterProps {
   temperature: number;
-  maxTokens: number;
-  onSettingsChange: (settings: { temperature: number; maxTokens: number }) => void;
+  max_tokens: number;
+  onSettingsChange: (settings: { temperature: number; max_tokens: number }) => void;
   disabled?: boolean;
 }
 
 export default function Footer({
   temperature,
-  maxTokens,
+  max_tokens,
   onSettingsChange,
   disabled = false
 }: FooterProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleTemperatureChange = (value: number) => {
-    onSettingsChange({ temperature: value, maxTokens });
+    onSettingsChange({ temperature: value, max_tokens });
   };
 
   const handleMaxTokensChange = (value: number) => {
-    onSettingsChange({ temperature, maxTokens: value });
+    onSettingsChange({ temperature, max_tokens: value });
   };
 
   return (
@@ -67,15 +67,15 @@ export default function Footer({
                 htmlFor="maxTokens" 
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
-                Максимум токенов: {maxTokens}
+                Максимум токенов: {max_tokens}
               </label>
               <input
                 id="maxTokens"
                 type="range"
-                min={COMPLETION_CONFIG.maxTokens.min}
-                max={COMPLETION_CONFIG.maxTokens.max}
-                step={COMPLETION_CONFIG.maxTokens.step}
-                value={maxTokens}
+                min={COMPLETION_CONFIG.max_tokens.min}
+                max={COMPLETION_CONFIG.max_tokens.max}
+                step={COMPLETION_CONFIG.max_tokens.step}
+                value={max_tokens}
                 onChange={(e) => handleMaxTokensChange(parseInt(e.target.value))}
                 disabled={disabled}
                 className="w-full mt-1"

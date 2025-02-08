@@ -98,7 +98,7 @@ export class XRouterProvider extends BaseProvider {
           messages: messages,
           model: options?.model || 'gigachat/gigachat',
           temperature: validatedOptions.temperature,
-          max_tokens: validatedOptions.maxTokens,
+          max_tokens: validatedOptions.max_tokens,
           stream: false
         },
         {

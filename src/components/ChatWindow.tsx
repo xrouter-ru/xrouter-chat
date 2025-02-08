@@ -1,10 +1,15 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Message } from '@prisma/client';
+
+interface ChatMessage {
+  role: string;
+  content: string;
+  model?: string | null;
+}
 
 interface ChatWindowProps {
-  messages: Message[];
+  messages: ChatMessage[];
   loading?: boolean;
   error?: string | null;
 }
@@ -45,26 +50,26 @@ const CopyButton = ({ text }: { text: string }) => {
 };
 
 // Компонент сообщения пользователя
-const UserMessage = ({ message }: { message: string }) => (
+const UserMessage = ({ content }: { content: string }) => (
   <div className="flex justify-end mb-4">
     <div className="inline-block max-w-[80%] p-4 rounded-lg bg-blue-500 text-white group">
       <div className="flex items-center justify-between mb-1">
         <div className="text-sm">Вы</div>
-        <CopyButton text={message} />
+        <CopyButton text={content} />
       </div>
       <div className="whitespace-pre-wrap break-words" data-testid="user-message">
-        {message}
+        {content}
       </div>
     </div>
   </div>
 );
 
 // Компонент ответа ассистента
-const AssistantResponse = ({ response, model }: { response: string; model?: string | null }) => (
+const AssistantResponse = ({ content, model }: { content: string; model?: string | null }) => (
   <div className="flex justify-start">
     <div className="inline-block max-w-[80%] p-4 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 group">
       <div className="whitespace-pre-wrap break-words" data-testid="provider-response">
-        {response}
+        {content}
       </div>
       <div className="mt-2 flex items-center justify-between">
         {model && (
@@ -72,19 +77,20 @@ const AssistantResponse = ({ response, model }: { response: string; model?: stri
             Модель: {model}
           </div>
         )}
-        <CopyButton text={response} />
+        <CopyButton text={content} />
       </div>
     </div>
   </div>
 );
 
-// Компонент сообщения с ответом
-const MessageWithResponse = ({ message, response, model }: { message: string; response?: string | null; model?: string | null }) => (
+// Компонент сообщения
+const MessageItem = ({ role, content, model }: ChatMessage) => (
   <div className="space-y-4">
-    <UserMessage message={message} />
-    {response && (
+    {role === 'user' ? (
+      <UserMessage content={content} />
+    ) : (
       <AssistantResponse 
-        response={response} 
+        content={content} 
         model={model}
       />
     )}
@@ -115,13 +121,13 @@ const ErrorState = ({ error }: { error: string }) => (
 );
 
 // Компонент списка сообщений
-const MessageList = ({ messages }: { messages: Message[] }) => (
+const MessageList = ({ messages }: { messages: ChatMessage[] }) => (
   <div className="space-y-4">
-    {messages.map((msg) => (
-      <MessageWithResponse 
-        key={msg.id}
-        message={msg.message}
-        response={msg.response}
+    {messages.map((msg, index) => (
+      <MessageItem 
+        key={index}
+        role={msg.role}
+        content={msg.content}
         model={msg.model}
       />
     ))}

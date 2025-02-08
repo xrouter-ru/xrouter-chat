@@ -13,7 +13,7 @@ export interface ProviderMessage {
 
 export interface CompletionOptions {
   temperature?: number;
-  maxTokens?: number;
+  max_tokens?: number;
   model?: string;
 }
 
@@ -59,7 +59,7 @@ export abstract class BaseProvider {
   protected validateOptions(options?: CompletionOptions): CompletionOptions {
     return {
       temperature: options?.temperature ?? 0.7,
-      maxTokens: options?.maxTokens ?? 1000
+      max_tokens: options?.max_tokens ?? 1000
     };
   }
 }
